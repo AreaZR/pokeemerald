@@ -675,8 +675,7 @@ SoundMainRAM_Unk2:
 	cmp r0, r1
 	beq _081DD594
 	str r0, [r4, o_SoundChannel_xpi]
-	mov r1, 0x21
-	mul r2, r1, r0
+	add r2, r0, r0, lsl #5
 	ldr r1, [r4, o_SoundChannel_wav]
 	add r2, r2, r1
 	add r2, r2, 0x10
