@@ -616,12 +616,9 @@ u16 AddWindow8Bit(const struct WindowTemplate *template)
         u16 attribute = GetBgAttribute(bgLayer, BG_ATTR_METRIC);
         if (attribute != 0xFFFF)
         {
-            s32 i;
-            memAddress = Alloc(attribute);
+            memAddress = AllocZeroed(attribute);
             if (memAddress == NULL)
                 return WINDOW_NONE;
-            for (i = 0; i < attribute; i++) // if we're going to zero out the memory anyway, why not call AllocZeroed?
-                memAddress[i] = 0;
             gWindowBgTilemapBuffers[bgLayer] = memAddress;
             SetBgTilemapBuffer(bgLayer, memAddress);
         }
