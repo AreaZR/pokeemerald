@@ -373,22 +373,22 @@ void BuildSpritePriorities(void)
 
 void SortSprites(void)
 {
-    u8 i;
-    for (i = 1; i < MAX_SPRITES; i++)
-    {
-        u8 j = i;
-        struct Sprite *sprite1 = &gSprites[sSpriteOrder[i - 1]];
-        struct Sprite *sprite2 = &gSprites[sSpriteOrder[i]];
-        u16 sprite1Priority = sSpritePriorities[sSpriteOrder[i - 1]];
-        u16 sprite2Priority = sSpritePriorities[sSpriteOrder[i]];
+    u8 key, jmagic;
+    for (u32 i = 1; i < MAX_SPRITES; i++) {
+        key = sSpriteOrder[i];
+        jmagic = sSpriteOrder[i - 1];
+        struct Sprite *sprite1 = &gSprites[jmagic];
+        struct Sprite *sprite2 = &gSprites[key];
+        u16 sprite1Priority = sSpritePriorities[jmagic];
+        u16 sprite2Priority = sSpritePriorities[key];
         s16 sprite1Y = sprite1->oam.y;
         s16 sprite2Y = sprite2->oam.y;
 
         if (sprite1Y >= DISPLAY_HEIGHT)
-            sprite1Y = sprite1Y - 256;
+            sprite1Y -= 256;
 
         if (sprite2Y >= DISPLAY_HEIGHT)
-            sprite2Y = sprite2Y - 256;
+            sprite2Y -= 256;
 
         if (sprite1->oam.affineMode == ST_OAM_AFFINE_DOUBLE
          && sprite1->oam.size == ST_OAM_SIZE_3)
@@ -397,7 +397,7 @@ void SortSprites(void)
             if (shape == ST_OAM_SQUARE || shape == ST_OAM_V_RECTANGLE)
             {
                 if (sprite1Y > 128)
-                    sprite1Y = sprite1Y - 256;
+                    sprite1Y -= 256;
             }
         }
 
@@ -408,40 +408,31 @@ void SortSprites(void)
             if (shape == ST_OAM_SQUARE || shape == ST_OAM_V_RECTANGLE)
             {
                 if (sprite2Y > 128)
-                    sprite2Y = sprite2Y - 256;
+                    sprite2Y -= 256;
             }
         }
+ 
+        /* Move elements of arr[0..i-1], that are
+          greater than key, to one position ahead
+          of their current position */
 
-        while (j > 0
-            && ((sprite1Priority > sprite2Priority)
-             || (sprite1Priority == sprite2Priority && sprite1Y < sprite2Y)))
-        {
-            u8 temp = sSpriteOrder[j];
-            sSpriteOrder[j] = sSpriteOrder[j - 1];
-            sSpriteOrder[j - 1] = temp;
+        u32 j = i;
+        while (((sprite1Priority > sprite2Priority)
+             || (sprite1Priority == sprite2Priority && sprite1Y < sprite2Y))) {
+            jmagic = sSpriteOrder[j - 1];
+            sSpriteOrder[j] = jmagic;
 
-            // UB: If j equals 1, then j-- makes j equal 0.
-            // Then, sSpriteOrder[-1] gets accessed below.
-            // Although this doesn't result in a bug in the ROM,
-            // the behavior is undefined.
-            j--;
-#ifdef UBFIX
+            j = j - 1;
+
             if (j == 0)
                 break;
-#endif
 
-            sprite1 = &gSprites[sSpriteOrder[j - 1]];
-            sprite2 = &gSprites[sSpriteOrder[j]];
-            sprite1Priority = sSpritePriorities[sSpriteOrder[j - 1]];
-            sprite2Priority = sSpritePriorities[sSpriteOrder[j]];
+            sprite1 = &gSprites[jmagic];
+            sprite1Priority = sSpritePriorities[jmagic];
             sprite1Y = sprite1->oam.y;
-            sprite2Y = sprite2->oam.y;
 
             if (sprite1Y >= DISPLAY_HEIGHT)
-                sprite1Y = sprite1Y - 256;
-
-            if (sprite2Y >= DISPLAY_HEIGHT)
-                sprite2Y = sprite2Y - 256;
+                sprite1Y -= 256;
 
             if (sprite1->oam.affineMode == ST_OAM_AFFINE_DOUBLE
              && sprite1->oam.size == ST_OAM_SIZE_3)
@@ -450,21 +441,11 @@ void SortSprites(void)
                 if (shape == ST_OAM_SQUARE || shape == ST_OAM_V_RECTANGLE)
                 {
                     if (sprite1Y > 128)
-                        sprite1Y = sprite1Y - 256;
-                }
-            }
-
-            if (sprite2->oam.affineMode == ST_OAM_AFFINE_DOUBLE
-             && sprite2->oam.size == ST_OAM_SIZE_3)
-            {
-                u32 shape = sprite2->oam.shape;
-                if (shape == ST_OAM_SQUARE || shape == ST_OAM_V_RECTANGLE)
-                {
-                    if (sprite2Y > 128)
-                        sprite2Y = sprite2Y - 256;
+                        sprite1Y -= 256;
                 }
             }
         }
+        sSpriteOrder[j] = key;
     }
 }
 
