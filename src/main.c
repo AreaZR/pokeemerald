@@ -57,8 +57,6 @@ const IntrFunc gIntrTableTemplate[] =
 
 #define INTR_COUNT ((int)(sizeof(gIntrTableTemplate)/sizeof(IntrFunc)))
 
-static u16 sUnusedVar; // Never read
-
 u16 gKeyRepeatStartDelay;
 bool8 gLinkTransferringData;
 struct Main gMain;
@@ -90,9 +88,6 @@ void AgbMain()
 {
     // Modern compilers are liberal with the stack on entry to this function,
     // so RegisterRamReset may crash if it resets IWRAM.
-#if !MODERN
-    RegisterRamReset(RESET_ALL);
-#endif //MODERN
     *(vu16 *)BG_PLTT = RGB_WHITE; // Set the backdrop to white on startup
     InitGpuRegManager();
     REG_WAITCNT = WAITCNT_PREFETCH_ENABLE | WAITCNT_WS0_S_1 | WAITCNT_WS0_N_3;
