@@ -88,10 +88,7 @@ void ProcessDma3Requests(void)
         sDma3Requests[sDma3RequestCursor].size = 0;
         sDma3Requests[sDma3RequestCursor].mode = 0;
         sDma3Requests[sDma3RequestCursor].value = 0;
-        sDma3RequestCursor++;
-
-        if (sDma3RequestCursor >= MAX_DMA_REQUESTS) // loop back to the first DMA request
-            sDma3RequestCursor = 0;
+        sDma3RequestCursor = (sDma3RequestCursor + 1) & 127;
     }
 }
 
@@ -119,8 +116,7 @@ s16 RequestDma3Copy(const void *src, void *dest, u16 size, u8 mode)
             sDma3ManagerLocked = FALSE;
             return cursor;
         }
-        if (++cursor >= MAX_DMA_REQUESTS) // loop back to start.
-            cursor = 0;
+        cursor = (cursor + 1) & 127;
         i++;
     }
     sDma3ManagerLocked = FALSE;
@@ -152,8 +148,7 @@ s16 RequestDma3Fill(s32 value, void *dest, u16 size, u8 mode)
             sDma3ManagerLocked = FALSE;
             return cursor;
         }
-        if (++cursor >= MAX_DMA_REQUESTS) // loop back to start.
-            cursor = 0;
+        cursor = (cursor + 1) & 127;
         i++;
     }
     sDma3ManagerLocked = FALSE;
