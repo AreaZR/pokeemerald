@@ -108,7 +108,6 @@ void AgbMain()
 #ifdef BUGFIX
     SeedRngWithRtc(); // see comment at SeedRngWithRtc definition below
 #endif
-    ClearDma3Requests();
     ResetBgs();
     SetDefaultFontsPointer();
     InitHeap();
@@ -119,7 +118,6 @@ void AgbMain()
         SetMainCallback2(NULL);
 
     gLinkTransferringData = FALSE;
-    sUnusedVar = 0xFC0;
 
 #ifndef NDEBUG
 #if (LOG_HANDLER == LOG_HANDLER_MGBA_PRINT)
