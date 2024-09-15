@@ -138,7 +138,7 @@ void TaskDummy(u8 taskId)
 
 void SetTaskFuncWithFollowupFunc(u8 taskId, TaskFunc func, TaskFunc followupFunc)
 {
-    u8 followupFuncIndex = NUM_TASK_DATA - 2; // Should be const.
+    const u8 followupFuncIndex = NUM_TASK_DATA - 2;
 
     gTasks[taskId].data[followupFuncIndex] = (s16)((u32)followupFunc);
     gTasks[taskId].data[followupFuncIndex + 1] = (s16)((u32)followupFunc >> 16); // Store followupFunc as two half-words in the data array.
@@ -147,7 +147,7 @@ void SetTaskFuncWithFollowupFunc(u8 taskId, TaskFunc func, TaskFunc followupFunc
 
 void SwitchTaskToFollowupFunc(u8 taskId)
 {
-    u8 followupFuncIndex = NUM_TASK_DATA - 2; // Should be const.
+    const u8 followupFuncIndex = NUM_TASK_DATA - 2;
 
     gTasks[taskId].func = (TaskFunc)((u16)(gTasks[taskId].data[followupFuncIndex]) | (gTasks[taskId].data[followupFuncIndex + 1] << 16));
 }

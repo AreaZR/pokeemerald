@@ -784,8 +784,7 @@ static void WindowFunc_ClearStdWindowAndFrameToTransparent(u8 bg, u8 tilemapLeft
 // Creates the window used to display the info bar at the top of the HOF PC that shows the controls and team number.
 u8 HofPCTopBar_AddWindow(u8 bg, u8 xPos, u8 yPos, u8 palette, u16 baseTile)
 {
-    struct WindowTemplate window;
-    memset(&window, 0, sizeof(window));
+    struct WindowTemplate window = {0};
 
     if (bg > 3)
         window.bg = 0;
