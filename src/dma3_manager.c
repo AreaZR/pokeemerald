@@ -41,7 +41,7 @@ void ClearDma3Requests(void)
 
 void ProcessDma3Requests(void)
 {
-    u16 bytesTransferred;
+    unsigned bytesTransferred;
 
     if (sDma3ManagerLocked)
         return;
