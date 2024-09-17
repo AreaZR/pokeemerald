@@ -39,11 +39,11 @@ const char BuildDateTime[] = "2005 02 21 11:10";
 
 const IntrFunc gIntrTableTemplate[] =
 {
+    VBlankIntr, // V-blank interrupt
+    HBlankIntr, // H-blank interrupt
     VCountIntr, // V-count interrupt
     SerialIntr, // Serial interrupt
     Timer3Intr, // Timer 3 interrupt
-    HBlankIntr, // H-blank interrupt
-    VBlankIntr, // V-blank interrupt
     IntrDummy,  // Timer 0 interrupt
     IntrDummy,  // Timer 1 interrupt
     IntrDummy,  // Timer 2 interrupt
@@ -54,6 +54,7 @@ const IntrFunc gIntrTableTemplate[] =
     IntrDummy,  // Key interrupt
     IntrDummy,  // Game Pak interrupt
 };
+
 
 #define INTR_COUNT ((int)(sizeof(gIntrTableTemplate)/sizeof(IntrFunc)))
 
@@ -95,7 +96,6 @@ void AgbMain()
     InitIntrHandlers();
     m4aSoundInit();
     EnableVCountIntrAtLine150();
-    InitRFU();
     RtcInit();
     CheckForFlashMemory();
     InitMainCallbacks();
@@ -332,9 +332,9 @@ void SetSerialCallback(IntrCallback callback)
 
 static void VBlankIntr(void)
 {
-    if (gWirelessCommType != 0)
-        RfuVSync();
-    else if (gLinkVSyncDisabled == FALSE)
+    m4aSoundVSync();
+    u16 savedIme;
+    if (gLinkVSyncDisabled == FALSE)
         LinkVSync();
 
     if (gTrainerHillVBlankCounter && *gTrainerHillVBlankCounter < 0xFFFFFFFF)
@@ -356,8 +356,6 @@ static void VBlankIntr(void)
 
     if (!gMain.inBattle || !(gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_FRONTIER | BATTLE_TYPE_RECORDED)))
         Random();
-
-    UpdateWirelessStatusIndicatorSprite();
 
     INTR_CHECK |= INTR_FLAG_VBLANK;
     gMain.intrCheck |= INTR_FLAG_VBLANK;
@@ -382,7 +380,6 @@ static void VCountIntr(void)
     if (gMain.vcountCallback)
         gMain.vcountCallback();
 
-    m4aSoundVSync();
     INTR_CHECK |= INTR_FLAG_VCOUNT;
     gMain.intrCheck |= INTR_FLAG_VCOUNT;
 }
@@ -403,17 +400,7 @@ static void WaitForVBlank(void)
 {
     gMain.intrCheck &= ~INTR_FLAG_VBLANK;
 
-    if (gWirelessCommType != 0)
-    {
-        // Desynchronization may occur if wireless adapter is connected
-        // and we call VBlankIntrWait();
-        while (!(gMain.intrCheck & INTR_FLAG_VBLANK))
-            ;
-    }
-    else
-    {
-        VBlankIntrWait();
-    }
+    VBlankIntrWait();
 }
 
 void SetTrainerHillVBlankCounter(u32 *counter)

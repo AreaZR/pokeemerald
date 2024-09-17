@@ -625,70 +625,67 @@ static u32 InitMainMenu(bool8 returningFromOptionsMenu)
 static void Task_MainMenuCheckSaveFile(u8 taskId)
 {
     s16 *data = gTasks[taskId].data;
+    if (gPaletteFade.active)
+        return;
 
-    if (!gPaletteFade.active)
+    SetGpuReg(REG_OFFSET_WIN0H, 0);
+    SetGpuReg(REG_OFFSET_WIN0V, 0);
+    SetGpuReg(REG_OFFSET_WININ, WININ_WIN0_BG0 | WININ_WIN0_OBJ);
+    SetGpuReg(REG_OFFSET_WINOUT, WINOUT_WIN01_BG0 | WINOUT_WIN01_OBJ | WINOUT_WIN01_CLR);
+    SetGpuReg(REG_OFFSET_BLDCNT, BLDCNT_EFFECT_DARKEN | BLDCNT_TGT1_BG0);
+    SetGpuReg(REG_OFFSET_BLDALPHA, 0);
+    SetGpuReg(REG_OFFSET_BLDY, 7);
+
+    switch (gSaveFileStatus)
     {
-        SetGpuReg(REG_OFFSET_WIN0H, 0);
-        SetGpuReg(REG_OFFSET_WIN0V, 0);
-        SetGpuReg(REG_OFFSET_WININ, WININ_WIN0_BG0 | WININ_WIN0_OBJ);
-        SetGpuReg(REG_OFFSET_WINOUT, WINOUT_WIN01_BG0 | WINOUT_WIN01_OBJ | WINOUT_WIN01_CLR);
-        SetGpuReg(REG_OFFSET_BLDCNT, BLDCNT_EFFECT_DARKEN | BLDCNT_TGT1_BG0);
-        SetGpuReg(REG_OFFSET_BLDALPHA, 0);
-        SetGpuReg(REG_OFFSET_BLDY, 7);
-
-        if (IsWirelessAdapterConnected())
-            tWirelessAdapterConnected = TRUE;
-        switch (gSaveFileStatus)
-        {
-            case SAVE_STATUS_OK:
-                tMenuType = HAS_SAVED_GAME;
-                if (IsMysteryGiftEnabled())
-                    tMenuType++;
-                gTasks[taskId].func = Task_MainMenuCheckBattery;
-                break;
-            case SAVE_STATUS_CORRUPT:
-                CreateMainMenuErrorWindow(gText_SaveFileErased);
-                tMenuType = HAS_NO_SAVED_GAME;
-                gTasks[taskId].func = Task_WaitForSaveFileErrorWindow;
-                break;
-            case SAVE_STATUS_ERROR:
-                CreateMainMenuErrorWindow(gText_SaveFileCorrupted);
-                gTasks[taskId].func = Task_WaitForSaveFileErrorWindow;
-                tMenuType = HAS_SAVED_GAME;
-                if (IsMysteryGiftEnabled() == TRUE)
-                    tMenuType++;
-                break;
-            case SAVE_STATUS_EMPTY:
-            default:
-                tMenuType = HAS_NO_SAVED_GAME;
-                gTasks[taskId].func = Task_MainMenuCheckBattery;
-                break;
-            case SAVE_STATUS_NO_FLASH:
-                CreateMainMenuErrorWindow(gJPText_No1MSubCircuit);
-                gTasks[taskId].tMenuType = HAS_NO_SAVED_GAME;
-                gTasks[taskId].func = Task_WaitForSaveFileErrorWindow;
-                break;
-        }
-        if (sCurrItemAndOptionMenuCheck & OPTION_MENU_FLAG)   // are we returning from the options menu?
-        {
-            switch (tMenuType)  // if so, highlight the OPTIONS item
-            {
-                case HAS_NO_SAVED_GAME:
-                case HAS_SAVED_GAME:
-                    sCurrItemAndOptionMenuCheck = tMenuType + 1;
-                    break;
-                case HAS_MYSTERY_GIFT:
-                    sCurrItemAndOptionMenuCheck = 3;
-                    break;
-                case HAS_MYSTERY_EVENTS:
-                    sCurrItemAndOptionMenuCheck = 4;
-                    break;
-            }
-        }
-        sCurrItemAndOptionMenuCheck &= ~OPTION_MENU_FLAG;  // turn off the "returning from options menu" flag
-        tCurrItem = sCurrItemAndOptionMenuCheck;
-        tItemCount = tMenuType + 2;
+    case SAVE_STATUS_OK:
+        tMenuType = HAS_SAVED_GAME;
+        if (IsMysteryGiftEnabled())
+            tMenuType++;
+        gTasks[taskId].func = Task_MainMenuCheckBattery;
+        break;
+    case SAVE_STATUS_CORRUPT:
+        CreateMainMenuErrorWindow(gText_SaveFileErased);
+        tMenuType = HAS_NO_SAVED_GAME;
+        gTasks[taskId].func = Task_WaitForSaveFileErrorWindow;
+        break;
+    case SAVE_STATUS_ERROR:
+        CreateMainMenuErrorWindow(gText_SaveFileCorrupted);
+        gTasks[taskId].func = Task_WaitForSaveFileErrorWindow;
+        tMenuType = HAS_SAVED_GAME;
+        if (IsMysteryGiftEnabled() == TRUE)
+            tMenuType++;
+        break;
+    case SAVE_STATUS_EMPTY:
+    default:
+        tMenuType = HAS_NO_SAVED_GAME;
+        gTasks[taskId].func = Task_MainMenuCheckBattery;
+        break;
+    case SAVE_STATUS_NO_FLASH:
+        CreateMainMenuErrorWindow(gJPText_No1MSubCircuit);
+        gTasks[taskId].tMenuType = HAS_NO_SAVED_GAME;
+        gTasks[taskId].func = Task_WaitForSaveFileErrorWindow;
+        break;
     }
+    if (sCurrItemAndOptionMenuCheck & OPTION_MENU_FLAG) // are we returning from the options menu?
+    {
+        switch (tMenuType) // if so, highlight the OPTIONS item
+        {
+        case HAS_NO_SAVED_GAME:
+        case HAS_SAVED_GAME:
+            sCurrItemAndOptionMenuCheck = tMenuType + 1;
+            break;
+        case HAS_MYSTERY_GIFT:
+            sCurrItemAndOptionMenuCheck = 3;
+            break;
+        case HAS_MYSTERY_EVENTS:
+            sCurrItemAndOptionMenuCheck = 4;
+            break;
+        }
+    }
+    sCurrItemAndOptionMenuCheck &= ~OPTION_MENU_FLAG; // turn off the "returning from options menu" flag
+    tCurrItem = sCurrItemAndOptionMenuCheck;
+    tItemCount = tMenuType + 2;
 }
 
 static void Task_WaitForSaveFileErrorWindow(u8 taskId)
@@ -888,7 +885,7 @@ static bool8 HandleMainMenuInput(u8 taskId)
     if (JOY_NEW(A_BUTTON))
     {
         PlaySE(SE_SELECT);
-        IsWirelessAdapterConnected();   // why bother calling this here? debug? Task_HandleMainMenuAPressed will check too
+
         BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 0x10, RGB_BLACK);
         gTasks[taskId].func = Task_HandleMainMenuAPressed;
     }
@@ -935,7 +932,6 @@ static void Task_HandleMainMenuInput(u8 taskId)
 
 static void Task_HandleMainMenuAPressed(u8 taskId)
 {
-    bool8 wirelessAdapterConnected;
     u8 action;
 
     if (!gPaletteFade.active)
@@ -950,7 +946,6 @@ static void Task_HandleMainMenuAPressed(u8 taskId)
         ClearStdWindowAndFrame(5, TRUE);
         ClearStdWindowAndFrame(6, TRUE);
         ClearStdWindowAndFrame(7, TRUE);
-        wirelessAdapterConnected = IsWirelessAdapterConnected();
         switch (gTasks[taskId].tMenuType)
         {
             case HAS_NO_SAVED_GAME:
@@ -992,12 +987,10 @@ static void Task_HandleMainMenuAPressed(u8 taskId)
                         action = ACTION_NEW_GAME;
                         break;
                     case 2:
-                        action = ACTION_MYSTERY_GIFT;
-                        if (!wirelessAdapterConnected)
-                        {
+    
                             action = ACTION_INVALID;
                             gTasks[taskId].tMenuType = HAS_NO_SAVED_GAME;
-                        }
+                        
                         break;
                     case 3:
                         action = ACTION_OPTION;
@@ -1015,35 +1008,12 @@ static void Task_HandleMainMenuAPressed(u8 taskId)
                         action = ACTION_NEW_GAME;
                         break;
                     case 2:
-                        if (gTasks[taskId].tWirelessAdapterConnected)
-                        {
-                            action = ACTION_MYSTERY_GIFT;
-                            if (!wirelessAdapterConnected)
-                            {
-                                action = ACTION_INVALID;
-                                gTasks[taskId].tMenuType = HAS_NO_SAVED_GAME;
-                            }
-                        }
-                        else if (wirelessAdapterConnected)
-                        {
-                            action = ACTION_INVALID;
-                            gTasks[taskId].tMenuType = HAS_SAVED_GAME;
-                        }
-                        else
-                        {
-                            action = ACTION_EREADER;
-                        }
+                        action = ACTION_EREADER;
                         break;
                     case 3:
-                        if (wirelessAdapterConnected)
-                        {
-                            action = ACTION_INVALID;
-                            gTasks[taskId].tMenuType = HAS_MYSTERY_GIFT;
-                        }
-                        else
-                        {
+
                             action = ACTION_MYSTERY_EVENTS;
-                        }
+                        
                         break;
                     case 4:
                         action = ACTION_OPTION;
