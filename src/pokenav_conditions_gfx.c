@@ -22,8 +22,6 @@ static u32 LoopedTask_SlideMonOut(s32);
 static u32 LoopedTask_OpenMonMarkingsWindow(s32);
 static u32 LoopedTask_CloseMonMarkingsWindow(s32);
 
-static u8 sInitialLoadId; // Never read
-
 const u16 gConditionGraphData_Pal[] = INCBIN_U16("graphics/pokenav/condition/graph_data.gbapal");
 const u16 gConditionText_Pal[] = INCBIN_U16("graphics/pokenav/condition/text.gbapal");
 static const u32 sConditionGraphData_Gfx[] = INCBIN_U32("graphics/pokenav/condition/graph_data.4bpp.lz");
@@ -867,7 +865,6 @@ static void DoConditionGraphEnterTransition(void)
     struct ConditionGraph *graph = GetConditionGraphPtr();
     u8 id = GetConditionGraphMenuCurrentLoadIndex();
 
-    sInitialLoadId = id;
     ConditionGraph_SetNewPositions(graph, graph->savedPositions[CONDITION_GRAPH_LOAD_MAX - 1], graph->savedPositions[id]);
     ConditionGraph_TryUpdate(graph);
 }
