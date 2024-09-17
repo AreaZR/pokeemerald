@@ -156,8 +156,8 @@ void AgbMain()
         }
 
         PlayTimeCounter_Update();
-        MapMusicMain();
         WaitForVBlank();
+        MapMusicMain();
     }
 }
 
@@ -337,11 +337,10 @@ static void VBlankIntr(void)
     else if (gLinkVSyncDisabled == FALSE)
         LinkVSync();
 
-    gMain.vblankCounter1++;
-
     if (gTrainerHillVBlankCounter && *gTrainerHillVBlankCounter < 0xFFFFFFFF)
         (*gTrainerHillVBlankCounter)++;
 
+    gMain.vblankCounter1++;
     if (gMain.vblankCallback)
         gMain.vblankCallback();
 
