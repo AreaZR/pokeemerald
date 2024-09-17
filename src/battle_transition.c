@@ -1796,7 +1796,7 @@ static bool8 PokeballsTrail_Main(struct Task *task)
     for (i = 0; i < NUM_POKEBALL_TRAILS; i++, side ^= 1)
     {
         gFieldEffectArguments[0] = startX[side];   // x
-        gFieldEffectArguments[1] = (i * 32) + 16;  // y
+        gFieldEffectArguments[1] = (i << 5) + 16;  // y
         gFieldEffectArguments[2] = side;
         gFieldEffectArguments[3] = delays[i];
         FieldEffectStart(FLDEFF_POKEBALL_TRAIL);
