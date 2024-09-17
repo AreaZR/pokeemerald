@@ -497,7 +497,7 @@ static void LoadUsePokeblockMenu(void)
         break;
     case 2:
         SetVBlankCallback(NULL);
-        CpuFill32(0, (void *)(VRAM), VRAM_SIZE);
+        DmaFill32(3, 0, VRAM, VRAM_SIZE);
         sInfo->mainState++;
         break;
     case 3:
