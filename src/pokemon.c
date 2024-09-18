@@ -2864,7 +2864,7 @@ void CalculateMonStats(struct Pokemon *mon)
     CALC_STAT(baseSpAttack, spAttackIV, spAttackEV, STAT_SPATK, MON_DATA_SPATK)
     CALC_STAT(baseSpDefense, spDefenseIV, spDefenseEV, STAT_SPDEF, MON_DATA_SPDEF)
 
-    if (currentHP == 0)
+    if (currentHP == 0 && oldMaxHP != 0)
         return;
 
     if (newMaxHP > oldMaxHP)
