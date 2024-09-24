@@ -2334,11 +2334,11 @@ static void MoveBattleBarGraphically(u8 battlerId, u8 whichBar)
 static s32 CalcNewBarValue(s32 maxValue, s32 oldValue, s32 receivedValue, s32 *currValue, u8 scale, u16 toAdd)
 {
     s32 ret, newValue;
-    scale *= 8;
+    u8 max = scale * 8;
 
     if (*currValue == -32768) // first function call
     {
-        if (maxValue < scale)
+        if (maxValue < max)
             *currValue = Q_24_8(oldValue);
         else
             *currValue = oldValue;
@@ -2350,7 +2350,7 @@ static s32 CalcNewBarValue(s32 maxValue, s32 oldValue, s32 receivedValue, s32 *c
     else if (newValue > maxValue)
         newValue = maxValue;
 
-    if (maxValue < scale)
+    if (maxValue < max)
     {
         if (newValue == Q_24_8_TO_INT(*currValue) && (*currValue & 0xFF) == 0)
             return -1;
@@ -2361,9 +2361,9 @@ static s32 CalcNewBarValue(s32 maxValue, s32 oldValue, s32 receivedValue, s32 *c
             return -1;
     }
 
-    if (maxValue < scale) // handle cases of max var having less pixels than the whole bar
+    if (maxValue < max) // handle cases of max var having less pixels than the whole bar
     {
-        s32 toAdd = Q_24_8(maxValue) / scale;
+        s32 toAdd = Q_24_8(maxValue) / max;
 
         if (receivedValue < 0) // fill bar right
         {
@@ -2396,15 +2396,14 @@ static s32 CalcNewBarValue(s32 maxValue, s32 oldValue, s32 receivedValue, s32 *c
             *currValue += toAdd;
             if (*currValue > newValue)
                 *currValue = newValue;
-            ret = *currValue;
         }
         else // move bar left
         {
             *currValue -= toAdd;
             if (*currValue < newValue)
                 *currValue = newValue;
-            ret = *currValue;
         }
+        ret = *currValue;
     }
 
     return ret;
