@@ -2441,15 +2441,12 @@ static u8 CalcBarFilledPixels(s32 maxValue, s32 oldValue, s32 receivedValue, s32
     {
         for (i = 0; i < scale; i++)
         {
-            if (pixels >= 8)
-            {
-                pixelsArray[i] = 8;
-            }
-            else
-            {
+            if (pixels < 8) {
                 pixelsArray[i] = pixels;
                 break;
             }
+
+            pixelsArray[i] = 8;
             pixels -= 8;
         }
     }
@@ -2495,10 +2492,9 @@ static void Debug_TestHealthBar_Helper(struct TestingBar *barInfo, s32 *currValu
 
 static u8 GetScaledExpFraction(s32 oldValue, s32 receivedValue, s32 maxValue, u8 scale)
 {
-    s32 newVal, result;
+    s32 newVal;
     s8 oldToMax, newToMax;
-
-    scale *= 8;
+    u8 maxPixel = scale * 8;
     newVal = oldValue - receivedValue;
 
     if (newVal < 0)
@@ -2506,11 +2502,10 @@ static u8 GetScaledExpFraction(s32 oldValue, s32 receivedValue, s32 maxValue, u8
     else if (newVal > maxValue)
         newVal = maxValue;
 
-    oldToMax = oldValue * scale / maxValue;
-    newToMax = newVal * scale / maxValue;
-    result = oldToMax - newToMax;
+    oldToMax = oldValue * maxPixel / maxValue;
+    newToMax = newVal * maxPixel / maxValue;
 
-    return abs(result);
+    return abs(oldToMax - newToMax);
 }
 
 u8 GetScaledHPFraction(s16 hp, s16 maxhp, u8 scale)
