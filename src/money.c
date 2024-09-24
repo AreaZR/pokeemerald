@@ -91,18 +91,14 @@ void AddMoney(u32 *moneyPtr, u32 toAdd)
 {
     u32 toSet = GetMoney(moneyPtr);
 
-    // can't have more money than MAX
-    if (toSet + toAdd > MAX_MONEY)
-    {
+    // can't add more money than MAX
+    if (toAdd > MAX_MONEY)
         toSet = MAX_MONEY;
-    }
     else
-    {
         toSet += toAdd;
-        // check overflow, can't have less money after you receive more
-        if (toSet < GetMoney(moneyPtr))
-            toSet = MAX_MONEY;
-    }
+
+    if (toSet > MAX_MONEY)
+        toSet = MAX_MONEY;
 
     SetMoney(moneyPtr, toSet);
 }
