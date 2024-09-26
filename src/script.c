@@ -92,7 +92,6 @@ bool8 RunScriptCommand(struct ScriptContext *ctx)
         while (1)
         {
             u8 cmdCode;
-            ScrCmdFunc *func;
 
             if (!ctx->scriptPtr)
             {
@@ -102,9 +101,8 @@ bool8 RunScriptCommand(struct ScriptContext *ctx)
 
 
             cmdCode = *(ctx->scriptPtr++);
-            func = &ctx->cmdTable[cmdCode];
 
-            if (func >= ctx->cmdTableEnd)
+            if (&ctx->cmdTable[cmdCode] >= ctx->cmdTableEnd)
             {
                 ctx->mode = SCRIPT_MODE_STOPPED;
                 return FALSE;
