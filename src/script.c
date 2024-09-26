@@ -100,14 +100,8 @@ bool8 RunScriptCommand(struct ScriptContext *ctx)
                 return FALSE;
             }
 
-            if (ctx->scriptPtr == gNullScriptPtr)
-            {
-                while (1)
-                    asm("svc 2"); // HALT
-            }
 
-            cmdCode = *(ctx->scriptPtr);
-            ctx->scriptPtr++;
+            cmdCode = *(ctx->scriptPtr++);
             func = &ctx->cmdTable[cmdCode];
 
             if (func >= ctx->cmdTableEnd)
@@ -117,7 +111,7 @@ bool8 RunScriptCommand(struct ScriptContext *ctx)
             }
 
             if ((*func)(ctx) == TRUE)
-                return TRUE;
+                break;
         }
     }
 
@@ -132,8 +126,7 @@ static bool8 ScriptPush(struct ScriptContext *ctx, const u8 *ptr)
     }
     else
     {
-        ctx->stack[ctx->stackDepth] = ptr;
-        ctx->stackDepth++;
+        ctx->stack[ctx->stackDepth++] = ptr;
         return FALSE;
     }
 }
@@ -143,8 +136,7 @@ static const u8 *ScriptPop(struct ScriptContext *ctx)
     if (ctx->stackDepth == 0)
         return NULL;
 
-    ctx->stackDepth--;
-    return ctx->stack[ctx->stackDepth];
+    return ctx->stack[--ctx->stackDepth];
 }
 
 void ScriptJump(struct ScriptContext *ctx, const u8 *ptr)
