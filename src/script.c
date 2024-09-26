@@ -33,7 +33,7 @@ extern void *gNullScriptPtr;
 
 void InitScriptContext(struct ScriptContext *ctx, void *cmdTable, void *cmdTableEnd)
 {
-    s32 i;
+    u32 i;
 
     ctx->mode = SCRIPT_MODE_STOPPED;
     ctx->scriptPtr = NULL;
@@ -42,10 +42,10 @@ void InitScriptContext(struct ScriptContext *ctx, void *cmdTable, void *cmdTable
     ctx->cmdTable = cmdTable;
     ctx->cmdTableEnd = cmdTableEnd;
 
-    for (i = 0; i < (int)ARRAY_COUNT(ctx->data); i++)
+    for (i = 0; i < ARRAY_COUNT(ctx->data); i++)
         ctx->data[i] = 0;
 
-    for (i = 0; i < (int)ARRAY_COUNT(ctx->stack); i++)
+    for (i = 0; i < ARRAY_COUNT(ctx->stack); i++)
         ctx->stack[i] = NULL;
 }
 
@@ -120,7 +120,7 @@ bool8 RunScriptCommand(struct ScriptContext *ctx)
 
 static bool8 ScriptPush(struct ScriptContext *ctx, const u8 *ptr)
 {
-    if (ctx->stackDepth + 1 >= (int)ARRAY_COUNT(ctx->stack))
+    if (ctx->stackDepth + 1 >= ARRAY_COUNT(ctx->stack))
     {
         return TRUE;
     }
