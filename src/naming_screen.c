@@ -1631,11 +1631,11 @@ static void HandleDpadMovement(struct Task *task)
     input = INPUT_NONE;
     if (JOY_REPEAT(DPAD_UP))
         input = INPUT_DPAD_UP;
-    if (JOY_REPEAT(DPAD_DOWN))
+    else if (JOY_REPEAT(DPAD_DOWN))
         input = INPUT_DPAD_DOWN;
     if (JOY_REPEAT(DPAD_LEFT))
         input = INPUT_DPAD_LEFT;
-    if (JOY_REPEAT(DPAD_RIGHT))
+    else if (JOY_REPEAT(DPAD_RIGHT))
         input = INPUT_DPAD_RIGHT;
 
     // Get new cursor position
